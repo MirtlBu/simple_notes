@@ -1,0 +1,42 @@
+body {
+    color: #333333;
+}
+button, textarea {
+    font-size: .75em;
+    vertical-align: bottom;
+    color: #333333;
+}
+button {
+    padding: .375em 1.125em;
+    font-weight: bold;
+    line-height: 1.43;
+    cursor: pointer;
+    user-select: none;
+    text-align: center;
+    color: #333333;
+    border: 1px solid #333333;
+    background: white;
+}
+button:hover {
+    color: #ffffff;
+    background: #333333;
+}
+button:focus, button:active, textarea:focus {
+    outline: 1px solid rgb(94, 158, 214);
+}
+textarea {
+    width: 50%;
+    height: 2.25em;
+    margin-top: 1.25rem;
+    margin-right: 1.25rem;
+    margin-bottom: 0;
+    padding-top: .375em;
+    padding-right: .375em;
+    padding-left: .375em;
+    box-sizing: border-box;
+    resize: none;
+}
+.container {
+    width: 70%;
+    margin: 0 auto;
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Notes</title>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1" name="viewport" />
+        <link rel="stylesheet" type="text/css" href="css/awsm.min.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body>
+
+        <div class="container" id="container"></div>
+
+        <script src="reactjs/react.js"></script>
+        <script src="reactjs/react-dom.min.js"></script>
+        <script src="reactjs/browser.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+
+        <script type="text/babel">
+
+            var Content = React.createClass({
+
+                componentDidMount: function() {
+                    this.setConnection();
+                },
+
+                getInitialState: function() {
+                    return {message: []};
+                },
+
+                server: io.connect('http://localhost:7000'),
+
+                setConnection: function() {
+
+                    this.server.on('messages', function(data) {
+                        this.setState({message: data});
+                    }.bind(this));
+
+                    this.server.on('connect', function() {
+                        this.emit('join');
+                    });
+
+                },
+
+                render: function() {
+                    return (
+                        <div>
+                            <Board server={this.server} message={this.state.message} />
+                        </div>
+                    );
+                }
+
+            });
+
+            var Board = React.createClass({
+
+                getInitialState: function() {
+                    return {textArray: []};
+                },
+
+                componentDidMount: function() {
+                    this.props.server.on('messages', function(data) {
+                        this.setState({textArray: data});
+                    }.bind(this));
+                },
+
+                getText: function(sometext) {
+                    var newText = this.state.textArray;
+                    newText.push(sometext);
+                    this.setState({textArray: this.props.message});
+                    this.props.server.emit('messages', this.state.textArray);
+                },
+
+                render: function() {
+                    return (
+                        <div>
+                            <TextField text={this.state.textArray}></TextField>
+                            <AddForm addText={this.getText}></AddForm>
+                        </div>
+                    );
+                }
+            });
+
+            var TextField = React.createClass({
+
+                renderParagraph: function(item, i) {
+                    return (<p key={i}>{item}</p>);
+                },
+
+                render: function() {
+                    return (
+                        <div>
+                            <h1>One more "notes"</h1>
+                            {this.props.text.map(this.renderParagraph)}
+                        </div>
+                    );
+                }
+
+            });
+
+            var AddForm = React.createClass({
+
+                setTextareaValue: function() {
+                    if(this.refs.newText.value.trim().length) {
+                        this.props.addText(this.refs.newText.value);
+                        this.refs.newText.value = '';
+                    }
+                },
+
+                toUppercase: function() {
+                    var string = this.refs.newText.value;
+                    var newString = string.charAt(0).toUpperCase() + string.slice(1);
+                    this.refs.newText.value = newString;
+                },
+
+                render: function() {
+                    return (
+                        <div>
+                            <textarea
+                                ref="newText"
+                                placeholder="Write here"
+                                onChange={this.toUppercase}>
+                            </textarea>
+                            <button onClick={this.setTextareaValue}>Add</button>
+                        </div>
+                    );
+                }
+            });
+            ReactDOM.render(
+                <Content />,
+                document.getElementById('container')
+            );
+        </script>
+
+    </body>
+</html>
